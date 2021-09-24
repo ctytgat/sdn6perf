@@ -5,7 +5,6 @@ import com.example.demo.model.Hobby;
 import com.example.demo.model.Movie;
 import com.github.javafaker.Faker;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.Before;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,16 +14,17 @@ import org.neo4j.ogm.session.Session;
 import org.neo4j.ogm.session.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.neo4j.DataNeo4jTest;
-import org.springframework.data.neo4j.core.Neo4jClient;
 import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.transaction.TestTransaction;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.testcontainers.containers.Neo4jContainer;
 import org.testcontainers.utility.MountableFile;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -69,7 +69,7 @@ class PerfTest {
         numHobbies = 100;
         numActors = 100;
         numHobbiesPerActor = 20;
-        numMovies = 500;
+        numMovies = 200;
         numActorsPerMovie = 20;
 
         log.info("Creating hobbies...");
@@ -141,6 +141,8 @@ class PerfTest {
 
         log.info("Start fetching movies");
 
+        // OGM supports collections of paths directly, but use same query as SDN for comparison
+        // Iterable<Movie> result = session.query(Movie.class, "MATCH p=(m:Movie)-[*0..]->() RETURN m, collect(p)", Map.of());
         Iterable<Movie> result = session.query(Movie.class, "MATCH p=(m:Movie)-[*0..]->() RETURN m, collect(nodes(p)), collect(relationships(p))", Map.of());
         log.info("Done fetching movies");
         validate(result);
