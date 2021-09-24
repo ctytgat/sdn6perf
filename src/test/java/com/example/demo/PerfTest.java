@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataNeo4jTest
 @Slf4j
-class MovieRepositoryTCTest {
+class PerfTest {
 
     private static Neo4jContainer<?> neo4jContainer;
 
